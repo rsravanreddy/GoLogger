@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"golang.org/x/net/context"
 	"gopkg.in/Shopify/sarama.v1"
 	elastic "gopkg.in/olivere/elastic.v5"
 	"io/ioutil"
@@ -17,8 +18,12 @@ import (
 	"time"
 )
 
+type accessLogEntry struct {
+	LogMessage []interface{}
+}
+
 var (
-	brokerList = flag.String("brokers", "sravans-mbp-2:9092", "The comma separated list of brokers in the Kafka cluster")
+	brokerList = flag.String("brokers", "localhost:9092", "The comma separated list of brokers in the Kafka cluster")
 	topic      = flag.String("topic", "access_log", "The topic to consume")
 	partition  = flag.Int("partition", 0, "The partition to consume")
 	offset     = flag.String("offset", "newest", "The offset to start with. Can be `oldest`, `newest`, or an actual offset")
@@ -30,6 +35,7 @@ var (
 func main() {
 
 	client, err := elastic.NewClient()
+
 	if err != nil {
 		// Handle error
 	}
@@ -79,20 +85,32 @@ func main() {
 	for msg := range pc.Messages() {
 		fmt.Printf("Offset: %d\n", msg.Offset)
 		fmt.Printf("Key:    %s\n", string(msg.Key))
-		fmt.Printf("Value:  %s\n", string(msg.Value))
+		//fmt.Printf("Value:  %s\n", string(msg.Value))
 
-		var accessLogs []interface{}
-		json.Unmarshal(msg.Value, &accessLogs)
-		fmt.Println(accessLogs)
+		var accessLog accessLogEntry
+		json.Unmarshal(msg.Value, &accessLog)
+		//fmt.Println(accessLog)
+		fmt.Println("working..")
+		for i := range accessLog.LogMessage {
 
-		for i := range accessLogs {
-			index1Req := NewBulkIndexRequest().Index(events).Type("event").Id(strconv.FormatInt(msg.Offset, 10) + string(msg.Key)).Doc(accessLogs[i])
+			indexReq := elastic.NewBulkIndexRequest().Index("events").Type("event").Id(strconv.FormatInt(msg.Offset, 10) + string(msg.Key) + "1").Doc(accessLog.LogMessage[i])
+			bulkRequest = bulkRequest.Add(indexReq)
+
 		}
 
-		messageUrl := "http://localhost:9200/events" + strconv.FormatInt(msg.Offset, 10) + string(msg.Key)
-		postToIndexer(messageUrl, msg.Value)
+		// messageUrl := "http://localhost:9200/events" + strconv.FormatInt(msg.Offset, 10) + string(msg.Key)
+		// postToIndexer(messageUrl, msg.Value)
 
-		fmt.Println()
+		bulkResponse, err := bulkRequest.Do(context.TODO())
+		if err != nil {
+			fmt.Println("erorr with error", err)
+
+		}
+		if bulkResponse == nil {
+			fmt.Println("erorr with response", bulkResponse)
+
+		}
+
 	}
 
 	if err := c.Close(); err != nil {

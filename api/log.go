@@ -9,5 +9,5 @@ type Log struct {
 	ProcessPath string `json:"process_path"`
 	TimeStamp   string `json:"time_stamp"`
 	NodeId      int    `json:"node_id"`
-	action      string `json:"action"`
+	Action      string `json:"action"`
 }

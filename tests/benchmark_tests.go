@@ -7,41 +7,34 @@ import (
 	"io/ioutil"
 	"logger/api"
 	"net/http"
-	"strconv"
 	"sync"
 	"time"
 )
+
+//  NodePath    string `json:"node_path"`
+// 	ProcessPath string `json:"process_path"`
+// 	TimeStamp   string `json:"time_stamp"`
+// 	NodeId      int    `json:"node_id"`
+// 	Action
 
 func main() {
 	var wg sync.WaitGroup
 	wg.Add(10000)
 	url := "http://localhost:8080/log"
 	for i := 0; i < 1000; i++ {
-		level := "error"
-		if i%2 == 0 {
-			level = "info"
-		}
-		go testData(url, level, "Russian guy vadim"+strconv.Itoa(i), i, &wg)
+		go testData(url, "/Application/chrome", "/usr/home/test.txt", "read", 1234, &wg)
 	}
 	// testData(url, "1", "message"+string(1), 1)
 	wg.Wait()
 
 }
 
-/*
-LogLevel   string `json:"log_level"`
-	LogPayload struct {
-		Message   string `json:"message"`
-		TimeStamp string `json:"time_stamp"`
-		ErrorCode int    `json:"error_code"`
-	} `json:"log_payload"`
-}*/
-
-func testData(url string, level string, msg string, er int, wg *sync.WaitGroup) {
+func testData(url string, processPath string, nodePath string, action string, nodeId int, wg *sync.WaitGroup) {
 	defer wg.Done()
 	fmt.Println("URL:>", url)
 	t := time.Now()
-	sampleData := api.Log{LogLevel: level, LogPayload: api.LogPayloads{Message: msg, TimeStamp: t.Format("20060102150405"), ErrorCode: er}}
+	sampleData := api.Log{NodePath: nodePath, ProcessPath: processPath, NodeId: nodeId, TimeStamp: t.Format("20060102150405"), Action: action}
+
 	b, err := json.Marshal(sampleData)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
