@@ -1,0 +1,6 @@
+svchost: :8080
+kafkaaddress: sravans-mbp-2:9092
+dbuser: root
+dbpassword: ""
+dbhost: localhost
+dbname: Todo
