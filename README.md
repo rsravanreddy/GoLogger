@@ -6,7 +6,7 @@ Go logger is a high performance logger which logs the messages to kafka and coms
 Before you start the service you need to run  kafka cluster and get valid kafka broker()
 
 ### step 1:
-Run a kafka cluster,default address is ```localhost:909```
+Start a kafka cluster,default broker address is ```localhost:9092``` if you used the out of box kafka server properties
 
 ### step 2:
 `svchost: :8080`  <br />
