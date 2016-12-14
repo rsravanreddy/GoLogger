@@ -24,4 +24,4 @@ You should see if everything went ok
 
 `[GIN-debug] POST   /log                      --> logger/service.(*LogResource).CreateLog-fm (4 handlers)` <br />
 `[GIN-debug] Environment variable PORT is undefined. Using port :8080 by default` <br />
-[GIN-debug] Listening and serving HTTP on :8080` <br />
+`[GIN-debug] Listening and serving HTTP on :8080` <br />
