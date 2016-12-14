@@ -17,8 +17,8 @@ Run a kafka cluster,default address is ```localhost:909```
 `dbname: Todo /*optioal*/` <br />
 
 ### step 3:
-`make build`
-`./cmd/server/server --config config.yaml server`
+`make build` <br />
+`./cmd/server/server --config config.yaml server` <br />
 
 You should see if everything went ok
 
